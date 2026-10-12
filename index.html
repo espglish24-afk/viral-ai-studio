@@ -1,98 +1,64 @@
-<script>
-  const URL_BACKEND = "https://script.google.com/macros/s/AKfycbzHYagd-5S8FOzOcovuBVYVnjG3_QZfQSOxP9E9DGpAwNOcvGX9SNHeDF6kN1Tj6QinOg/exec";
+// CORREGIDO: Se agregaron comillas a la URL para que sea una cadena de texto válida
+const URL_BACKEND = "https://script.google.com/macros/s/AKfycbzHYagd-5S8FOzOcovuBVYVnjG3_QZfQSOxP9E9DGpAwNOcvGX9SNHeDF6kN1Tj6QinOg/exec"; 
 
-  function generar() {
-    const idea = document.getElementById("idea").value.trim();
+function generar() { 
+    const idea = document.getElementById('idea').value.trim(); 
+    if (!idea) { 
+        alert("Primero escribe tu idea para el video."); 
+        return; 
+    } 
+    const tipo = document.getElementById('tipo').value; 
+    const duracion = document.getElementById('duracion').value; 
+    const estilo = document.getElementById('estilo').value; 
+    const formato = document.getElementById('formato').value; 
+    
+    const sonido = tipo.includes('ASMR') 
+        ? "Immersive, crisp ASMR sound design synchronized with every movement. No music, no talking." 
+        : "Carefully designed sound effects synchronized with the visual action."; 
+        
+    const prompt = `Create a ${duracion} ${tipo} video based on this idea: ${idea}. VISUAL STYLE: ${estilo}. Professional lighting, detailed textures, realistic materials, smooth camera movements, beautiful composition, sharp focus and cinematic quality. ACTION: Show the main subject clearly. Build visual anticipation, use deliberate movements, reveal satisfying details and finish with a memorable visual moment. SOUND DESIGN: ${sonido} TECHNICAL REQUIREMENTS: Aspect ratio: ${formato}. Consistent subjects, clean composition, natural motion, no unwanted text, no logos, no watermarks. ENDING: Create a visually satisfying ending that encourages replay and, where appropriate, transitions smoothly into the opening shot.`; 
+    
+    document.getElementById('resultado').textContent = prompt; 
+    document.getElementById('resultado').style.display = "block"; 
+    document.getElementById('copiar').style.display = "block"; 
+    
+    guardarPrompt({ idea: idea, categoria: tipo, duracion: duracion, prompt: prompt }); 
+} 
 
-    if (!idea) {
-      alert("Primero escribe tu idea para el video.");
-      return;
-    }
+async function guardarPrompt(datos) { 
+    let estado = document.getElementById('estadoGuardado'); 
+    if (!estado) { 
+        estado = document.createElement('p'); 
+        estado.id = 'estadoGuardado'; 
+        estado.className = 'nota'; 
+        document.getElementById('resultado').after(estado); 
+    } 
+    estado.textContent = "Enviando a tu base de datos..."; 
+    try { 
+        await fetch(URL_BACKEND, { 
+            method: 'POST', 
+            mode: 'no-cors', 
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+            body: JSON.stringify(datos) 
+        }); 
+        estado.textContent = "Solicitud enviada. Revisa Google Sheets para confirmar que se guardó."; 
+    } catch (error) { 
+        estado.textContent = "No se pudo enviar. Revisa tu conexión e intenta de nuevo."; 
+    } 
+} 
 
-    const tipo = document.getElementById("tipo").value;
-    const duracion = document.getElementById("duracion").value;
-    const estilo = document.getElementById("estilo").value;
-    const formato = document.getElementById("formato").value;
-
-    const sonido = tipo.includes("ASMR")
-      ? "Immersive, crisp ASMR sound design synchronized with every movement. No music, no talking."
-      : "Carefully designed sound effects synchronized with the visual action.";
-
-    const prompt = `Create a ${duracion} ${tipo} video based on this idea: ${idea}.
-
-VISUAL STYLE:
-${estilo}. Professional lighting, detailed textures, realistic materials, smooth camera movements, beautiful composition, sharp focus and cinematic quality.
-
-ACTION:
-Show the main subject clearly. Build visual anticipation, use deliberate movements, reveal satisfying details and finish with a memorable visual moment.
-
-SOUND DESIGN:
-${sonido}
-
-TECHNICAL REQUIREMENTS:
-Aspect ratio: ${formato}. Consistent subjects, clean composition, natural motion, no unwanted text, no logos, no watermarks.
-
-ENDING:
-Create a visually satisfying ending that encourages replay and, where appropriate, transitions smoothly into the opening shot.`;
-
-    document.getElementById("resultado").textContent = prompt;
-    document.getElementById("resultado").style.display = "block";
-    document.getElementById("copiar").style.display = "block";
-
-    guardarPrompt({
-      idea: idea,
-      categoria: tipo,
-      duracion: duracion,
-      prompt: prompt
-    });
-  }
-
-  async function guardarPrompt(datos) {
-    let estado = document.getElementById("estadoGuardado");
-
-    if (!estado) {
-      estado = document.createElement("p");
-      estado.id = "estadoGuardado";
-      estado.className = "nota";
-      document.getElementById("resultado").after(estado);
-    }
-
-    estado.textContent = "Enviando a tu base de datos...";
-
-    try {
-      await fetch(URL_BACKEND, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(datos)
-      });
-
-      estado.textContent =
-        "Solicitud enviada. Revisa Google Sheets para confirmar que se guardó.";
-    } catch (error) {
-      estado.textContent =
-        "No se pudo enviar. Revisa tu conexión e intenta de nuevo.";
-    }
-  }
-
-  async function copiarPrompt() {
-    const texto = document.getElementById("resultado").textContent;
-
-    try {
-      await navigator.clipboard.writeText(texto);
-      alert("¡Prompt copiado!");
-    } catch (e) {
-      const area = document.createElement("textarea");
-      area.value = texto;
-      document.body.appendChild(area);
-      area.select();
-      document.execCommand("copy");
-      area.remove();
-      alert("¡Prompt copiado!");
-    }
-  }
-</script>
-</body>
-</html>
+async function copiarPrompt() { 
+    const texto = document.getElementById('resultado').textContent; 
+    try { 
+        await navigator.clipboard.writeText(texto); 
+        alert("¡Prompt copiado!"); 
+    } catch (e) { 
+        const area = document.createElement('textarea'); 
+        area.value = texto; 
+        document.body.appendChild(area); 
+        area.select(); 
+        document.execCommand('copy'); 
+        area.remove(); 
+        alert("¡Prompt copiado!"); 
+    } 
+}
