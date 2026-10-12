@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10111c">
+  <meta name="description" content="Crea prompts profesionales para videos virales con IA.">
+  <title>Viral AI Studio</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10111c;
+      color: #f5f5ff;
+    }
+    header {
+      padding: 24px 16px;
+      text-align: center;
+      background: #191a2a;
+      border-bottom: 1px solid #34354a;
+    }
+    header h1 { margin: 0; font-size: 28px; }
+    header span { color: #a99bff; }
+    header p { color: #c0c0d2; margin-bottom: 0; }
+    main {
+      max-width: 650px;
+      margin: 30px auto;
+      padding: 22px;
+    }
+    .panel {
+      background: #1b1c2d;
+      border: 1px solid #35364b;
+      border-radius: 18px;
+      padding: 22px;
+    }
+    label {
+      display: block;
+      margin: 17px 0 8px;
+      font-weight: bold;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 13px;
+      border-radius: 9px;
+      border: 1px solid #45465d;
+      background: #11121e;
+      color: white;
+      font-size: 16px;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+    button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      border: 0;
+      border-radius: 10px;
+      background: #8b78ff;
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #7560ed; }
+    #resultado {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #11121e;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.6;
+      display: none;
+    }
+    .nota { color: #b9b9ce; font-size: 13px; }
+    footer { text-align: center; padding: 20px; color: #999ab2; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Viral <span>AI</span> Studio</h1>
+    <p>Convierte tus ideas en prompts profesionales.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>Crea tu próximo video viral</h2>
+      <p class="nota">Generador inicial gratuito de prompts.</p>
+
+      <label for="tipo">Tipo de video</label>
+      <select id="tipo">
+        <option value="ASMR satisfactorio">ASMR satisfactorio</option>
+        <option value="Video cinematográfico">Cinematográfico</option>
+        <option value="Video de producto">Producto comercial</option>
+        <option value="Video de fantasía">Fantasía visual</option>
+        <option value="Video de comida">Comida y postres</option>
+      </select>
+
+      <label for="idea">Describe tu idea</label>
+      <textarea id="idea" placeholder="Ejemplo: una fresa transparente de cristal cortada con un cuchillo..."></textarea>
+
+      <label for="duracion">Duración</label>
+      <select id="duracion">
+        <option>10 segundos</option>
+        <option selected>15 segundos</option>
+        <option>30 segundos</option>
+        <option>60 segundos</option>
+      </select>
+
+      <label for="estilo">Estilo visual</label>
+      <select id="estilo">
+        <option>Fotorrealista, macro 4K</option>
+        <option>Cinematográfico profesional</option>
+        <option>Fantástico y surrealista</option>
+        <option>Minimalista y elegante</option>
+      </select>
+
+      <label for="formato">Formato</label>
+      <select id="formato">
+        <option>Vertical 9:16</option>
+        <option>Horizontal 16:9</option>
+        <option>Cuadrado 1:1</option>
+      </select>
+
+      <button onclick="generar()">GENERAR PROMPT</button>
+
+      <div id="resultado"></div>
+      <button id="copiar" onclick="copiarPrompt()" style="display:none">COPIAR PROMPT</button>
+    </section>
+  </main>
+
+  <footer>Viral AI Studio · Tu creatividad, impulsada por IA.</footer>
+
+  <script>
+    function generar() {
+      const idea = document.getElementById("idea").value.trim();
+      if (!idea) {
+        alert("Primero escribe tu idea para el video.");
+        return;
+      }
+
+      const tipo = document.getElementById("tipo").value;
+      const duracion = document.getElementById("duracion").value;
+      const estilo = document.getElementById("estilo").value;
+      const formato = document.getElementById("formato").value;
+
+      let sonido = tipo.includes("ASMR")
+        ? "Immersive, crisp ASMR sound design synchronized with every movement. No music, no talking."
+        : "Carefully designed sound effects synchronized with the visual action.";
+
+      let prompt = `Create a ${duracion} ${tipo} video based on this idea: ${idea}.
+
+VISUAL STYLE:
+${estilo}. Professional lighting, detailed textures, realistic materials, smooth camera movements, beautiful composition, sharp focus and cinematic quality.
+
+ACTION:
+Show the main subject clearly. Build visual anticipation, use deliberate movements, reveal satisfying details and finish with a memorable visual moment.
+
+SOUND DESIGN:
+${sonido}
+
+TECHNICAL REQUIREMENTS:
+Aspect ratio: ${formato}. Consistent subjects, clean composition, natural motion, no unwanted text, no logos, no watermarks.
+
+ENDING:
+Create a visually satisfying ending that encourages replay and, where appropriate, transitions smoothly into the opening shot.`;
+
+      const salida = document.getElementById("resultado");
+      salida.textContent = prompt;
+      salida.style.display = "block";
+      document.getElementById("copiar").style.display = "block";
+    }
+
+    async function copiarPrompt() {
+      const texto = document.getElementById("resultado").textContent;
+      try {
+        await navigator.clipboard.writeText(texto);
+        alert("¡Prompt copiado!");
+      } catch (e) {
+        const area = document.createElement("textarea");
+        area.value = texto;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        alert("¡Prompt copiado!");
+      }
+    }
+  </script>
+</body>
+  </html>
+  
